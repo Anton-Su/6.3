@@ -1,8 +1,6 @@
 package com.example.a63.domain.model
 
-/**
- * User - бизнес-модель для слоя Domain
- */
+
 data class User(
     val id: Int,
     val firstName: String,
