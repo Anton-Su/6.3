@@ -19,9 +19,9 @@ sealed class UiState<out T> {
 }
 
 class LoginViewModel : ViewModel() {
-    private val _username = MutableStateFlow("")
+    private val _username = MutableStateFlow("emilys")
     val username: StateFlow<String> = _username.asStateFlow()
-    private val _password = MutableStateFlow("")
+    private val _password = MutableStateFlow("emilyspass")
     val password: StateFlow<String> = _password.asStateFlow()
     private val _loginState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
     val loginState: StateFlow<UiState<Unit>> = _loginState.asStateFlow()
@@ -37,11 +37,11 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch {
             delay(500)
             _users.value = listOf(
-                User(1, "John", "Doe", "johndoe", "john@example.com", "https://i.pravatar.cc/150?img=1"),
-                User(2, "Jane", "Smith", "janesmith", "jane@example.com", "https://i.pravatar.cc/150?img=2"),
-                User(3, "Bob", "Johnson", "bobjohnson", "bob@example.com", "https://i.pravatar.cc/150?img=3"),
-                User(4, "Alice", "Williams", "alicew", "alice@example.com", "https://i.pravatar.cc/150?img=4"),
-                User(5, "Charlie", "Brown", "charlie", "charlie@example.com", "https://i.pravatar.cc/150?img=5")
+                User(1, "John", "Doe", "johndoe", "john@example.com", "https://i.pravatar.cc/150?img=1", age = 30),
+                User(2, "Jane", "Smith", "janesmith", "jane@example.com", "https://i.pravatar.cc/150?img=2", age = 25),
+                User(3, "Bob", "Johnson", "bobjohnson", "bob@example.com", "https://i.pravatar.cc/150?img=3", age = 28),
+                User(4, "Alice", "Williams", "alicew", "alice@example.com", "https://i.pravatar.cc/150?img=4", age = 32),
+                User(5, "Charlie", "Brown", "charlie", "charlie@example.com", "https://i.pravatar.cc/150?img=5", age = 22)
             )
         }
     }
@@ -61,7 +61,7 @@ class LoginViewModel : ViewModel() {
                 delay(900)
                 if (_username.value == "no_internet") throw IOException("No connection")
 
-                if (_username.value == "user" && _password.value == "password") {
+                if (_username.value == "emilys" && _password.value == "emilyspass") {
                     _loginState.value = UiState.Success(Unit)
                     _isLoggedIn.value = true
                 } else {

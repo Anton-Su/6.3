@@ -62,7 +62,7 @@ fun UserDetailScreen(
             }
         )
         AsyncImage(
-            model = user.avatar,
+            model = user.image,
             contentDescription = "${user.firstName} ${user.lastName}",
             modifier = Modifier
                 .size(200.dp)
@@ -83,6 +83,12 @@ fun UserDetailScreen(
         )
         Text(
             text = "@${user.username}",
+            fontSize = 14.sp,
+            modifier = Modifier.padding(top = 8.dp),
+            color = androidx.compose.material3.MaterialTheme.colorScheme.outline
+        )
+        Text(
+            text = "${user.age}",
             fontSize = 14.sp,
             modifier = Modifier.padding(top = 8.dp),
             color = androidx.compose.material3.MaterialTheme.colorScheme.outline

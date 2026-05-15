@@ -9,6 +9,7 @@ data class User(
     val lastName: String,
     val username: String,
     val email: String,
-    val avatar: String?
+    val image: String?,
+    val age: Int?,
 )
 

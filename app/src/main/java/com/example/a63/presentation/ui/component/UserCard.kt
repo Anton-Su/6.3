@@ -41,7 +41,7 @@ fun UserCard(user: User, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = user.avatar,
+                model = user.image,
                 contentDescription = "${user.firstName} ${user.lastName}",
                 modifier = Modifier.size(72.dp),
                 contentScale = ContentScale.Crop

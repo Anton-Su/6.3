@@ -8,7 +8,8 @@ data class UserEntity(
     val lastName: String,
     val username: String,
     val email: String,
-    val avatar: String?
+    val image: String?,
+    val age: Int?,
 )
 
 fun UserEntity.toDomain(): User {
@@ -18,6 +19,15 @@ fun UserEntity.toDomain(): User {
         lastName = lastName,
         username = username,
         email = email,
-        avatar = avatar
+        image = image,
+        age = age
     )
 }
+
+
+data class UsersResponse(
+    val users: List<UserEntity>,
+    val total: Int,
+    val skip: Int,
+    val limit: Int
+)
