@@ -2,7 +2,9 @@ package com.example.a63.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.a63.data.remote.RetrofitClient
 import com.example.a63.domain.model.User
+import com.example.a63.domain.usecase.AutorizeRepositoryUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +20,7 @@ sealed class UiState<out T> {
     data class Error(val message: String) : UiState<Nothing>()
 }
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(val autorizeRepositoryUseCase: AutorizeRepositoryUseCase) : ViewModel() {
     private val _username = MutableStateFlow("emilys")
     val username: StateFlow<String> = _username.asStateFlow()
     private val _password = MutableStateFlow("emilyspass")
@@ -35,14 +37,18 @@ class LoginViewModel : ViewModel() {
 
     private fun loadUsers() {
         viewModelScope.launch {
-            delay(500)
-            _users.value = listOf(
-                User(1, "John", "Doe", "johndoe", "john@example.com", "https://i.pravatar.cc/150?img=1", age = 30),
-                User(2, "Jane", "Smith", "janesmith", "jane@example.com", "https://i.pravatar.cc/150?img=2", age = 25),
-                User(3, "Bob", "Johnson", "bobjohnson", "bob@example.com", "https://i.pravatar.cc/150?img=3", age = 28),
-                User(4, "Alice", "Williams", "alicew", "alice@example.com", "https://i.pravatar.cc/150?img=4", age = 32),
-                User(5, "Charlie", "Brown", "charlie", "charlie@example.com", "https://i.pravatar.cc/150?img=5", age = 22)
-            )
+
+            _users.value = autorizeRepositoryUseCase()
+
+
+//            delay(500)
+//            _users.value = listOf(
+//                User(1, "John", "Doe", "johndoe", "john@example.com", "https://i.pravatar.cc/150?img=1", age = 30),
+//                User(2, "Jane", "Smith", "janesmith", "jane@example.com", "https://i.pravatar.cc/150?img=2", age = 25),
+//                User(3, "Bob", "Johnson", "bobjohnson", "bob@example.com", "https://i.pravatar.cc/150?img=3", age = 28),
+//                User(4, "Alice", "Williams", "alicew", "alice@example.com", "https://i.pravatar.cc/150?img=4", age = 32),
+//                User(5, "Charlie", "Brown", "charlie", "charlie@example.com", "https://i.pravatar.cc/150?img=5", age = 22)
+//            )
         }
     }
 

@@ -3,8 +3,10 @@ package com.example.a63.presentation.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -15,6 +17,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -39,59 +43,63 @@ fun UserDetailScreen(
     navHostController: NavHostController,
     user: User,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        TopAppBar(
-            title = {
-                Text("Детали пользователя")
-            },
-            navigationIcon = {
-                IconButton(
-                    onClick = { navHostController.popBackStack() }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Назад"
-                    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Детали пользователя") },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navHostController.popBackStack() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Назад"
+                        )
+                    }
                 }
-            }
-        )
-        AsyncImage(
-            model = user.image,
-            contentDescription = "${user.firstName} ${user.lastName}",
-            modifier = Modifier
-                .size(200.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
-        Text(
-            text = "${user.firstName} ${user.lastName}",
-            fontWeight = FontWeight.Bold,
-            fontSize = 28.sp,
-            modifier = Modifier.padding(top = 24.dp)
-        )
-        Text(
-            text = user.email,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 12.dp),
-            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = "@${user.username}",
-            fontSize = 14.sp,
-            modifier = Modifier.padding(top = 8.dp),
-            color = androidx.compose.material3.MaterialTheme.colorScheme.outline
-        )
-        Text(
-            text = "${user.age}",
-            fontSize = 14.sp,
-            modifier = Modifier.padding(top = 8.dp),
-            color = androidx.compose.material3.MaterialTheme.colorScheme.outline
-        )
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            AsyncImage(
+                model = user.image,
+                contentDescription = "${user.firstName} ${user.lastName}",
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "${user.firstName} ${user.lastName}",
+                fontWeight = FontWeight.Bold,
+                fontSize = 28.sp
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = user.email,
+                fontSize = 20.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Ник: @${user.username}",
+                fontSize = 20.sp,
+                color = MaterialTheme.colorScheme.outline
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Возраст: ${user.age}",
+                fontSize = 20.sp,
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
     }
 }
