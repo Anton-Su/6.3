@@ -12,9 +12,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,11 +32,11 @@ import com.example.a63.domain.model.User
 import com.example.a63.navigation.Screen
 import com.example.a63.presentation.viewmodel.LoginViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserDetailScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    viewModel: LoginViewModel = viewModel(),
     user: User,
 ) {
     Column(
@@ -44,19 +46,21 @@ fun UserDetailScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(
-                onClick = { navHostController.popBackStack() }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Назад"
-                )
+        TopAppBar(
+            title = {
+                Text("Детали пользователя")
+            },
+            navigationIcon = {
+                IconButton(
+                    onClick = { navHostController.popBackStack() }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Назад"
+                    )
+                }
             }
-        }
+        )
         AsyncImage(
             model = user.avatar,
             contentDescription = "${user.firstName} ${user.lastName}",
@@ -83,18 +87,5 @@ fun UserDetailScreen(
             modifier = Modifier.padding(top = 8.dp),
             color = androidx.compose.material3.MaterialTheme.colorScheme.outline
         )
-        Button(
-            onClick = {
-                viewModel.logout()
-                navHostController.navigate(Screen.LoginScreen.route) },
-                modifier = Modifier
-                    .fillMaxSize(0.8f)
-                    .padding(top = 32.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.error
-                )
-        ) {
-            Text("Выйти", fontSize = 16.sp)
-        }
     }
 }

@@ -51,7 +51,6 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier, 
                 UserDetailScreen(
                     modifier = modifier,
                     navHostController = navController,
-                    viewModel = vm,
                     user = user
                 )
             }
