@@ -10,18 +10,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.a63.navigation.Navigation
+import com.example.a63.presentation.viewmodel.LoginViewModel
 import com.example.a63.ui.theme._63Theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val vm = LoginViewModel()
         setContent {
             _63Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Navigation(
                         navController = rememberNavController(),
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        vm = vm
                     )
                 }
             }

@@ -2,6 +2,7 @@ package com.example.a63.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.a63.domain.model.User
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,51 +18,71 @@ sealed class UiState<out T> {
     data class Error(val message: String) : UiState<Nothing>()
 }
 
-
 class LoginViewModel : ViewModel() {
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username.asStateFlow()
-
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password.asStateFlow()
-
     private val _loginState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
     val loginState: StateFlow<UiState<Unit>> = _loginState.asStateFlow()
+    private val _isLoggedIn = MutableStateFlow(false)
+    private val _users = MutableStateFlow<List<User>>(emptyList())
+    val users = _users.asStateFlow()
 
+    init {
+        loadUsers()
+    }
+
+    private fun loadUsers() {
+        viewModelScope.launch {
+            delay(500)
+            _users.value = listOf(
+                User(1, "John", "Doe", "johndoe", "john@example.com", "https://i.pravatar.cc/150?img=1"),
+                User(2, "Jane", "Smith", "janesmith", "jane@example.com", "https://i.pravatar.cc/150?img=2"),
+                User(3, "Bob", "Johnson", "bobjohnson", "bob@example.com", "https://i.pravatar.cc/150?img=3"),
+                User(4, "Alice", "Williams", "alicew", "alice@example.com", "https://i.pravatar.cc/150?img=4"),
+                User(5, "Charlie", "Brown", "charlie", "charlie@example.com", "https://i.pravatar.cc/150?img=5")
+            )
+        }
+    }
+
+    // --- Login API ---
     fun updateUsername(value: String) {
         _username.value = value
     }
-
     fun updatePassword(value: String) {
         _password.value = value
     }
 
-    fun resetState() {
-        _loginState.value = UiState.Idle
-    }
-
     fun onLogin() {
-        // Простая имитация логина — позже замените на вызов репозитория/retrofit
         viewModelScope.launch {
             _loginState.value = UiState.Loading
             try {
-                // имитируем сетевой запрос
-                delay(1200)
-
-                // Симуляция ошибок: если username == "no_internet" -> IOException
+                delay(900)
                 if (_username.value == "no_internet") throw IOException("No connection")
 
                 if (_username.value == "user" && _password.value == "password") {
                     _loginState.value = UiState.Success(Unit)
+                    _isLoggedIn.value = true
                 } else {
                     _loginState.value = UiState.Error("Неверные данные")
+                    _isLoggedIn.value = false
                 }
             } catch (e: IOException) {
                 _loginState.value = UiState.Error("Нет соединения")
+                _isLoggedIn.value = false
             } catch (e: Exception) {
                 _loginState.value = UiState.Error(e.message ?: "Ошибка")
+                _isLoggedIn.value = false
             }
         }
+    }
+
+    fun logout() {
+        _username.value = ""
+        _password.value = ""
+        _loginState.value = UiState.Idle
+        _isLoggedIn.value = false
     }
 }
 
