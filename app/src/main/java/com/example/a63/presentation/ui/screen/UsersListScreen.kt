@@ -15,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,15 +39,11 @@ fun UsersListScreen(
             TopAppBar(
                 title = { Text("Пользователи") },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            viewModel.logout()
-                            navHostController.navigate(Screen.LoginScreen.route) {
-                                popUpTo(Screen.UsersListScreen.route) { inclusive = true }
-                                launchSingleTop = true
-                            }
-                        }
-                    ) {
+                            IconButton(
+                                onClick = {
+                                    viewModel.logoutAndNavigateToLogin()
+                                }
+                            ) {
                         Icon(
                             imageVector = Icons.Default.Home,
                             contentDescription = "Home"
@@ -69,6 +67,15 @@ fun UsersListScreen(
                         navHostController.navigate(Screen.UserDetailScreen.createRoute(user.id))
                     }
                 )
+            }
+        }
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.navigation.collectLatest { route ->
+            navHostController.navigate(route) {
+                popUpTo(Screen.UsersListScreen.route) { inclusive = true }
+                launchSingleTop = true
             }
         }
     }

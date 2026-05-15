@@ -11,6 +11,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -40,6 +42,9 @@ class LoginViewModel(
 
     private val _user = MutableStateFlow(User(0, "", "", "", "", "", age = 0))
     val user = _user.asStateFlow()
+
+    private val _navigation = MutableSharedFlow<String>()
+    val navigation = _navigation.asSharedFlow()
 
     init {
         loadUsers()
@@ -110,6 +115,22 @@ class LoginViewModel(
                 _password.value = ""
                 _loginState.value = UiState.Idle
                 _isLoggedIn.value = false
+            }
+        }
+    }
+
+    fun logoutAndNavigateToLogin() {
+        viewModelScope.launch {
+            try {
+                logoutUseCase()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _username.value = ""
+                _password.value = ""
+                _loginState.value = UiState.Idle
+                _isLoggedIn.value = false
+                _navigation.emit("login")
             }
         }
     }
