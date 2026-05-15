@@ -2,9 +2,11 @@ package com.example.a63.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.a63.data.remote.RetrofitClient
 import com.example.a63.domain.model.User
-import com.example.a63.domain.usecase.AutorizeRepositoryUseCase
+import com.example.a63.domain.usecase.UsersRepositoryUseCase
+import com.example.a63.domain.usecase.LoginUseCase
+import com.example.a63.domain.usecase.LogoutUseCase
+import com.example.a63.domain.usecase.UserRepositoryUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +22,12 @@ sealed class UiState<out T> {
     data class Error(val message: String) : UiState<Nothing>()
 }
 
-class LoginViewModel(val autorizeRepositoryUseCase: AutorizeRepositoryUseCase) : ViewModel() {
+class LoginViewModel(
+    private val usersRepositoryUseCase: UsersRepositoryUseCase,
+    private val loginUseCase: LoginUseCase,
+    private val logoutUseCase: LogoutUseCase,
+    private val userRepositoryUseCase: UserRepositoryUseCase
+) : ViewModel() {
     private val _username = MutableStateFlow("emilys")
     val username: StateFlow<String> = _username.asStateFlow()
     private val _password = MutableStateFlow("emilyspass")
@@ -31,6 +38,9 @@ class LoginViewModel(val autorizeRepositoryUseCase: AutorizeRepositoryUseCase) :
     private val _users = MutableStateFlow<List<User>>(emptyList())
     val users = _users.asStateFlow()
 
+    private val _user = MutableStateFlow(User(0, "", "", "", "", "", age = 0))
+    val user = _user.asStateFlow()
+
     init {
         loadUsers()
     }
@@ -38,7 +48,7 @@ class LoginViewModel(val autorizeRepositoryUseCase: AutorizeRepositoryUseCase) :
     private fun loadUsers() {
         viewModelScope.launch {
 
-            _users.value = autorizeRepositoryUseCase()
+            _users.value = usersRepositoryUseCase()
 
 
 //            delay(500)
@@ -52,7 +62,18 @@ class LoginViewModel(val autorizeRepositoryUseCase: AutorizeRepositoryUseCase) :
         }
     }
 
-    // --- Login API ---
+    fun loadUser(userId: Int) {
+        viewModelScope.launch {
+            try {
+                val result = userRepositoryUseCase(userId)
+                _user.value = result
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
     fun updateUsername(value: String) {
         _username.value = value
     }
@@ -65,15 +86,9 @@ class LoginViewModel(val autorizeRepositoryUseCase: AutorizeRepositoryUseCase) :
             _loginState.value = UiState.Loading
             try {
                 delay(900)
-                if (_username.value == "no_internet") throw IOException("No connection")
-
-                if (_username.value == "emilys" && _password.value == "emilyspass") {
-                    _loginState.value = UiState.Success(Unit)
-                    _isLoggedIn.value = true
-                } else {
-                    _loginState.value = UiState.Error("Неверные данные")
-                    _isLoggedIn.value = false
-                }
+                loginUseCase(_username.value, _password.value)
+                _loginState.value = UiState.Success(Unit)
+                _isLoggedIn.value = true
             } catch (e: IOException) {
                 _loginState.value = UiState.Error("Нет соединения")
                 _isLoggedIn.value = false
@@ -85,10 +100,18 @@ class LoginViewModel(val autorizeRepositoryUseCase: AutorizeRepositoryUseCase) :
     }
 
     fun logout() {
-        _username.value = ""
-        _password.value = ""
-        _loginState.value = UiState.Idle
-        _isLoggedIn.value = false
+        viewModelScope.launch {
+            try {
+                logoutUseCase()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _username.value = ""
+                _password.value = ""
+                _loginState.value = UiState.Idle
+                _isLoggedIn.value = false
+            }
+        }
     }
 }
 

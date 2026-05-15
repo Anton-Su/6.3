@@ -2,12 +2,11 @@ package com.example.a63.data.repository
 
 import com.example.a63.data.remote.RetrofitClient
 import com.example.a63.domain.model.User
-import com.example.a63.domain.repository.AutorizeRepository
-import com.example.a63.data.model.UsersResponse
+import com.example.a63.domain.repository.UsersRepository
 import com.example.a63.data.model.toDomain
 
 
-class AutorizeRepositoryImpl : AutorizeRepository {
+class UsersRepositoryImpl : UsersRepository {
     override suspend fun getUsers(): List<User> {
         return try {
             val body = RetrofitClient.api.getUsers()
@@ -18,3 +17,5 @@ class AutorizeRepositoryImpl : AutorizeRepository {
         }
     }
 }
+
+

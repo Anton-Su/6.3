@@ -1,8 +1,6 @@
 package com.example.a63.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -43,17 +41,12 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier, 
             arguments = listOf(navArgument("userId") { type = NavType.IntType }))
         { backStackEntry ->
             val userId = backStackEntry.arguments?.getInt("userId")
-            val users = vm.users.collectAsState().value
-            val user = userId?.let { id ->
-                users.find { it.id == id }
-            }
-            if (user != null) {
-                UserDetailScreen(
-                    modifier = modifier,
-                    navHostController = navController,
-                    user = user
-                )
-            }
+            vm.loadUser(userId!!)
+            UserDetailScreen(
+                modifier = modifier,
+                navHostController = navController,
+                viewModel = vm
+            )
         }
     }
 }

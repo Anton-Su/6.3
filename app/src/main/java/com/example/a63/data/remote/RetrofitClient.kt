@@ -1,5 +1,7 @@
 package com.example.a63.data.remote
 
+import android.content.Context
+import com.example.a63.data.preferences.TokenManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
@@ -14,18 +16,40 @@ object RetrofitClient {
     val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
-    val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(logging)      // логирование
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .build()
     private val moshi: Moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
-    val api: AutorizeApiRetrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .client(okHttpClient)
-        .build()
-        .create(AutorizeApiRetrofit::class.java)
+    @Volatile
+    private var initialized = false
+    private lateinit var apiService: AutorizeApiRetrofit
+
+    fun init(context: Context) {
+        if (initialized) return
+
+        synchronized(this) {
+            if (initialized) return
+            val tokenManager = TokenManager(context.applicationContext)
+            val okHttpClient = OkHttpClient.Builder()
+                .addInterceptor(logging) // логирование
+                .addInterceptor(AuthInterceptor(tokenManager))
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build()
+            apiService = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .client(okHttpClient)
+                .build()
+                .create(AutorizeApiRetrofit::class.java)
+            initialized = true
+        }
+    }
+
+    val api: AutorizeApiRetrofit
+        get() {
+            check(initialized) {
+                "RetrofitClient is not initialized. Call RetrofitClient.init(context) first."
+            }
+            return apiService
+        }
 }
